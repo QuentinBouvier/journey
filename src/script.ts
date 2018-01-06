@@ -1,6 +1,6 @@
 /// <reference path="typings/index.d.ts" />
 
-import { Renderer } from './Classes/Renderer';
+import { Scene } from './Classes/Scene';
 import { Camera } from './Classes/Camera';
 
 var rendererOptions = {
@@ -19,7 +19,7 @@ var cameraOptions = {
     z: 800
 };
 
-var renderer = new Renderer('cube', rendererOptions, cameraOptions);
+var renderer = new Scene('cube', rendererOptions, cameraOptions);
 
 // Création d'une géométrie wireframe pour le cube
 var geometry = new THREE.BoxBufferGeometry(200,200,200);

@@ -22,8 +22,30 @@ export class Camera {
         this._camera.position.set(this._position.x, this._position.y, this._position.z);
     }
 
-    public camera = (): THREE.PerspectiveCamera => {
+    private update = ():void =>
+    {
+        this._camera.position.set(this._position.x, this._position.y, this._position.z);
+        this._camera.fov = this._properties.fov;
+        this._camera.aspect = this._properties.aspect;
+        this._camera.near = this._properties.near;
+        this._camera.far = this._properties.far;
+    }
+
+    public getCamera = (): THREE.PerspectiveCamera => {
         return this._camera;
+    }
+
+    public setProperty = (property: string, value: number): Boolean => {
+        if (typeof this._properties[property] !== undefined) {
+            this._properties[property] = value;
+        }
+        else if (typeof this._position[property] !== undefined) {
+            this._properties[property] = value;
+        } else {
+            return false;
+        }
+        this.update();
+        return true;
     }
 }
 
