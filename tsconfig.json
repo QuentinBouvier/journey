@@ -1,16 +1,19 @@
 {
     "compilerOptions": {
         "target": "ES5",
-        "module": "commonjs",
+        "module": "CommonJS",
         "jsx": "preserve",
-        "outDir": "./js/"
+        "outDir": "./js"
     },
     "exclude": [
         "node_modules",
-        "**/node_modules/*"
+        "**/node_modules/*",
+        "bower_components",
+        "**/bower_components/*",
+        "src/bannerJS.d.ts"
     ],
     "include": [
         "src/*",
-        "src/class/*"
+        "src/Classes/*"
     ]
 }

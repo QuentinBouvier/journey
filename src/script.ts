@@ -1,5 +1,4 @@
 /// <reference path="typings/index.d.ts" />
-/// <reference path="./Classes/Classes.d.ts" />
 
 import { Renderer } from './Classes/Renderer';
 import { Camera } from './Classes/Camera';
