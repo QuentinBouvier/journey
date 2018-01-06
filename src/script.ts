@@ -1,5 +1,8 @@
 /// <reference path="typings/index.d.ts" />
-/// <reference path="class/renderer.ts" />
+/// <reference path="./Classes/Classes.d.ts" />
+
+import { Renderer } from './Classes/Renderer';
+import { Camera } from './Classes/Camera';
 
 var rendererOptions = {
     options: {antialias: true},
@@ -17,10 +20,10 @@ var cameraOptions = {
     z: 800
 };
 
-renderer = new journey.Renderer('cube', rendererOptions, cameraOptions);
+var renderer = new Renderer('cube', rendererOptions, cameraOptions);
 
 // Création d'une géométrie wireframe pour le cube
-var geometry = new THREE.CubeGeometry(200,200,200);
+var geometry = new THREE.BoxBufferGeometry(200,200,200);
 var lineGeometry = new THREE.EdgesGeometry(geometry, 1);
 
 // matériau uni noir pour le cube
