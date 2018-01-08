@@ -3,14 +3,16 @@
         "target": "ES5",
         "module": "CommonJS",
         "jsx": "preserve",
-        "outDir": "./js"
+        "outDir": "./js",
+        "sourceMap": true
     },
     "exclude": [
         "node_modules",
         "**/node_modules/*",
         "bower_components",
         "**/bower_components/*",
-        "src/bannerJS.d.ts"
+        "src/bannerJS.d.ts",
+        "**/typings"
     ],
     "include": [
         "src/*",

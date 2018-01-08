@@ -1,0 +1,16 @@
+{
+  "name": "journey",
+  "version": "0.0.1",
+  "description": "THREE.js b&w environement",
+  "main": "script.ts",
+  "dependencies": {
+    "three": "^0.89.0",
+    "three-first-person-controls": "^0.2.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Quentin BOUVIER / Babbleprod",
+  "license": "MIT"
+}
