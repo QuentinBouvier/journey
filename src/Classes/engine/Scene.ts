@@ -1,4 +1,4 @@
-/// <reference path="../typings/index.d.ts" />
+/// <reference path="../../typings/index.d.ts" />
 
 import { Camera } from './Camera';
 
@@ -9,10 +9,10 @@ import { Camera } from './Camera';
  */
 
 export class Scene {
-    private _renderer: THREE.WebGLRenderer;
-    private _camera: Camera;
-    private _mesh: { [index: string]: THREE.Mesh } = {};
-    private _scene: THREE.Scene;
+    protected _renderer: THREE.WebGLRenderer;
+    protected _camera: Camera;
+    protected _mesh: { [index: string]: THREE.Mesh } = {};
+    protected _scene: THREE.Scene;
 
     constructor(blockId: string, rendererOptions: rndOpt, camera: Camera) {
         this._renderer = new THREE.WebGLRenderer(rendererOptions.options);
@@ -57,7 +57,7 @@ export class Scene {
     }
 
     /** Main animation function */
-    private _game() {
+    protected _game() {
         
     }
 
@@ -78,10 +78,3 @@ export interface rndOpt {
     width, height: number;
 }
 
-/**
- * Interfacing for camera options constructor.
- */
-export interface camOpt {
-    fov, aspect, near, far: number;
-    x, y, z: number;
-}
