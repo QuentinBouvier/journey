@@ -7,12 +7,20 @@ import { Input } from './engine/Input';
 
 export class GameScene extends Scene
 {
-    constructor(blockId: string, rendererOptions: rndOpt, camera: Camera) {
+    protected _camera: Player;
+    protected _input: Input;
 
-        super(blockId, rendererOptions,camera);        
+    constructor(blockId: string, rendererOptions: rndOpt, camera: Player) {
 
+        super(blockId, rendererOptions, camera);
+
+        this._input = new Input();
+    }
+
+    public launch = () =>
+    {
         this.init();
-        //this.animate();
+        this.animate();
     }
 
     public init = () => {
@@ -42,5 +50,49 @@ export class GameScene extends Scene
         meshCube2.add(line2);
 
         this.render();
+
+        this._input.assignKeys({ 
+            'up': [ 90, 87 ], // z, w
+            'down': [ 83 ], // s
+            'left': [ 81, 65 ], // q, a
+            'right': [ 68 ] // d
+        });
+        this._input.run();
+        this._input.listenToFocus();
+
+        this._input.enablePointerLock();
+        
+    }
+
+    public animate = () => {
+        requestAnimationFrame(() => this.animate());
+
+        this.mesh("mainCube").rotation.y += 0.003;
+
+        this.mesh("secondaryCube").rotation.y -= 0.003;
+
+        this.motion();
+
+        this.render();
+    }
+
+    public motion = () =>
+    {
+        if (this._input.checkInput('up'))
+        {
+            this._camera.move({x: 0, y: 0, z: -10});
+        }
+        if (this._input.checkInput('down'))
+        {
+            this._camera.move({x: 0, y: 0, z: 10});
+        }
+        if (this._input.checkInput('left'))
+        {
+            this._camera.move({x: -10, y: 0, z: 0});
+        }
+        if (this._input.checkInput('right'))
+        {
+            this._camera.move({x: 10, y: 0, z: 0});
+        }
     }
 }

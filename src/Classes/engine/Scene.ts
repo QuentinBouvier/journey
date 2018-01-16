@@ -8,7 +8,7 @@ import { Camera } from './Camera';
  * has a collection of meshes to render
  */
 
-export class Scene {
+export abstract class Scene {
     protected _renderer: THREE.WebGLRenderer;
     protected _camera: Camera;
     protected _mesh: { [index: string]: THREE.Mesh } = {};
@@ -25,7 +25,7 @@ export class Scene {
      * Collect all meshes and render
      * @returns { Void }
      */
-    public render = () => {
+    protected render = () => {
         document.getElementById('cube').appendChild(this._renderer.domElement);
         this._scene = new THREE.Scene();
         for (let element in this._mesh)
@@ -49,24 +49,22 @@ export class Scene {
     }
 
     /**  */
-    public animate = () => 
-    {
-        requestAnimationFrame(()=>this.animate());
-
-        this._game();
-    }
-
-    /** Main animation function */
-    protected _game() {
-        
-    }
+    abstract animate = ():void => {}
 
     /**
-     * _mesh getter
+     * _mesh table getter
      * @returns {{ [index: string]: THREE.Mesh }}
      */
     public meshes = ():{ [index: string]: THREE.Mesh } => {
         return this._mesh;
+    }
+
+    /**
+     * _mesh single getter
+     */
+    public mesh = (meshName:string) =>
+    {
+        return this._mesh[meshName];
     }
 }
 
