@@ -66,7 +66,7 @@ export class Camera {
     /**
      * @return { coord }
      */
-    public getPosition = (): coord => {
+    public position = (): coord => {
         return this._position;
     }
 
@@ -86,7 +86,7 @@ export class Camera {
     public move = (offset: coord) => {
         this._position.x += offset.x;
         this._position.y += offset.y;
-        this._position.z += offset.y;
+        this._position.z += offset.z;
 
         this._update();
     }
