@@ -1,17 +1,16 @@
 /// <reference path="../../typings/index.d.ts" />
 
-
 /**
  * Nesting THREE.PerspectiveCamera in a class
  * Everything to initialise a Camera and securely moving it
  */
 export class Camera {
-    private _camera: THREE.PerspectiveCamera;
-    private _fov: number;
-    private _aspect: number;
-    private _near: number;
-    private _far: number;
-    private _position: coord;
+    protected _camera: THREE.PerspectiveCamera;
+    protected _fov: number;
+    protected _aspect: number;
+    protected _near: number;
+    protected _far: number;
+    protected _position: coord;
 
     constructor(cameraOptions: camOpt) {
         this._fov = cameraOptions.fov;
@@ -31,7 +30,7 @@ export class Camera {
     /**
      * Push properties into the camera
      */
-    private _update = ():void =>
+    protected _update = ():void =>
     {
         this._camera.position.set(this._position.x, this._position.y, this._position.z);
         this._camera.fov = this._fov;
@@ -83,12 +82,46 @@ export class Camera {
      * Moves the camera with given offset
      * @param { coord } offset
      */
-    public move = (offset: coord) => {
-        this._position.x += offset.x;
-        this._position.y += offset.y;
-        this._position.z += offset.z;
+    public move = {
 
-        this._update();
+        x: (ox:number) => {
+            this._position.x += ox;
+            this._update();
+        },
+
+        y: (oy: number) => {
+            this._position.y += oy
+            this._update();;
+        },
+
+        z: (oz: number) => {
+            this._position.z += oz;
+            this._update();
+        },
+
+        all: (offset: {x:number, y:number, z:number}) =>
+        {            
+            this._position.x += offset.x;
+            this._position.y += offset.y;
+            this._position.z += offset.z;        
+            this._update();
+        }
+
+    };
+
+    public rotate = {
+        x: (ax:number) =>
+        {
+            this._camera.rotateX(ax);
+        },
+        y: (ay:number) =>
+        {
+            this._camera.rotateY(ay);
+        },
+        z:(az:number) =>
+        {
+            this._camera.rotateZ(az);
+        }
     }
 }
 
