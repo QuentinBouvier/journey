@@ -18,4 +18,12 @@ export class Player extends Camera
     {
         return this._rayCaster;
     }
+
+    public getDirection = ():THREE.Vector3 => 
+    {
+        var dir = new THREE.Vector3();
+        dir = this._camera.getWorldDirection();
+
+        return dir.normalize();
+    }
 }
