@@ -14,14 +14,24 @@ export class Input
         this._mouse = { rx: 0, ry:0 };
     }
 
+    /**
+     * Initialize all listeners for the inputs
+     * 
+     * @memberof Input
+     */
     public run = () => {
         this.listenToFocus();
         this.enablePointerLock();
         this.mouse();
-        this.keyboard();
-        
+        this.keyboard();        
     }
 
+    /**
+     * Set listener for mouse movements.
+     * Update this._mouse with mousemove offsets
+     * 
+     * @memberof Input
+     */
     public mouse = () => {
 
         var motionStop = () => {
@@ -49,6 +59,12 @@ export class Input
         });
     }
 
+    /**
+     * Set listeners on keyup and keydown.
+     * Update this._keyboardEvents.
+     * 
+     * @memberof Input
+     */
     public keyboard = () => {
         window.addEventListener('keydown', (e) => {
             var code: number = e.keyCode;
@@ -65,6 +81,12 @@ export class Input
         });
     }
 
+    /**
+     * Set a listener on widow's focus event.
+     * Update this._hasFocus.
+     * 
+     * @memberof Input
+     */
     public listenToFocus = () =>
     {
         // see https://coderwall.com/p/cwpdaw/how-to-tell-if-app-page-has-focus
@@ -100,6 +122,12 @@ export class Input
         window.addEventListener("blur", () => focusChanged(this));
     }
 
+    /**
+     * Set pointerlock on the window when the game is clicked
+     * Update this._hasFocus when pointer lock is caught or lost.
+     * 
+     * @memberof Input
+     */
     public enablePointerLock = () => {
 
         // see https://threejs.org/examples/?q=pointer#misc_controls_pointerlock
@@ -135,16 +163,25 @@ export class Input
         }
     }
 
+    /**
+     * Set a control key
+     * 
+     * @param { string } name The control name
+     * @param { number } keyCode(...) One or more keycodes for the control
+     * @memberof Input
+     */
     public setKey = (name: string, ...keyCode: number[]) => 
     {
         this._keyMap[name] = keyCode;
     }
 
-    public keyboardEvents = () => 
-    {
-        return this._keyboardEvents;
-    }
-
+    /**
+     * Assign a variable number of controls through an objet.
+     * Update this._keymap
+     * 
+     * @param { [controlName: string]: number[] } keys Collection of { name: [ keyCode1, keyCode2?], ... }
+     * @memberof Input
+     */
     public assignKeys = (keys: { [controlName: string]: number[] }) =>
     {
         for (let name in keys)
@@ -153,15 +190,45 @@ export class Input
         }
     }
 
+    /**
+     * this._keyboardEvents getter
+     * 
+     * @returns { [key: string ]: number[] } this._keyboardEvents
+     * @memberof Input
+     */
+    public keyboardEvents = () => 
+    {
+        return this._keyboardEvents;
+    }
+
+    /**
+     * this._keyMap getter
+     * 
+     * @returns { [index: string]: number[] } this._keymap
+     * @memberof Input
+     */
     public keyMap = ():{ [index: string]: number[] } => 
     {
         return this._keyMap;
     }
 
+    /**
+     * this._mouse getter
+     * 
+     * @returns { rx:number, ry:number } this._mouse
+     * @memberof Input
+     */
     public mouseMotion = () => {
         return this._mouse;
     }
 
+    /**
+     * Check if key named in the key map is pressed
+     * 
+     * @param { string } control Control name
+     * @returns { boolean } True if corresponding control key is pressed
+     * @memberof Input
+     */
     public checkInput = (control: string):boolean =>
     {
         var pressed:boolean = false;
@@ -177,6 +244,12 @@ export class Input
         return pressed;
     }
 
+    /**
+     * this._hasFocus getter
+     * 
+     * @returns { boolean } this._hasFocus
+     * @memberof Input
+     */
     public hasFocus = ():boolean =>
     {
         return this._hasFocus;

@@ -7,7 +7,6 @@ import { Camera } from './Camera';
  * includes one renderer and one camera
  * has a collection of meshes to render
  */
-
 export abstract class Scene {
     protected _renderer: THREE.WebGLRenderer;
     protected _camera: Camera;
@@ -24,6 +23,7 @@ export abstract class Scene {
     /**
      * Collect all meshes and render
      * @returns { Void }
+     * @memberof Scene
      */
     protected render = () => {
         document.getElementById('cube').appendChild(this._renderer.domElement);
@@ -37,9 +37,10 @@ export abstract class Scene {
     }
 
     /**
-     * adds meshes to the scene
-     * @argument { [index: string]: THREE.Mesh } ...mesh Meshes to be added to the render pool.
+     * add meshes to the scene
+     * @argument { [index: string]: THREE.Mesh } mesh Collection of meshes to be added to the render pool.
      * @returns { Void }
+     * @memberof Scene
      */
     public addMesh = (mesh: { [index: string]:THREE.Mesh }) => {
         for (let element in mesh)
@@ -52,15 +53,18 @@ export abstract class Scene {
     abstract animate = ():void => {}
 
     /**
-     * _mesh table getter
+     * this._mesh table getter
      * @returns {{ [index: string]: THREE.Mesh }}
+     * @memberof Scene
      */
     public meshes = ():{ [index: string]: THREE.Mesh } => {
         return this._mesh;
     }
 
     /**
-     * _mesh single getter
+     * this._mesh single row getter
+     * @param { string } meshName Mesh name
+     * @memberof Scene
      */
     public mesh = (meshName:string) =>
     {
@@ -69,7 +73,7 @@ export abstract class Scene {
 }
 
 /**
- * Interfacing for renderer options constructor.
+ * Interface for renderer options constructor.
  */
 export interface rndOpt {
     options: {[key:string]:any};
