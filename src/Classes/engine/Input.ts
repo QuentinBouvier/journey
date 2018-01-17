@@ -4,20 +4,56 @@ export class Input
 {
     private _keyboardEvents: { [index: number]: boolean };
     private _keyMap: { [index: string]: number[] };
+    private _mouse: { rx:number, ry:number };
+    private _hasFocus: boolean = true;
 
     public constructor()
     {
         this._keyboardEvents = {};
         this._keyMap = {};
+        this._mouse = { rx: 0, ry:0 };
     }
 
     public run = () => {
         this.listenToFocus();
+        this.enablePointerLock();
+        this.mouse();
+        this.keyboard();
         
+    }
+
+    public mouse = () => {
+
+        var motionStop = () => {
+            this._mouse = {
+                rx: 0,
+                ry: 0
+            }
+        }
+
+        window.addEventListener('mousemove', (e) => {
+
+            if (timer) {
+                window.clearTimeout(timer);
+            }
+
+            var movementX = e.movementX || e.mozMovementX || e.webkitMovementX || 0;
+            var movementY = e.movementY || e.mozMovementY || e.webkitMovementY || 0;
+
+            this._mouse = {
+                rx: movementX,
+                ry: movementY
+            }
+
+            var timer = window.setTimeout(() => { motionStop() }, 15);
+        });
+    }
+
+    public keyboard = () => {
         window.addEventListener('keydown', (e) => {
             var code: number = e.keyCode;
 
-            if (this._keyboardEvents[code] != true)
+            if (this._keyboardEvents[code] != true && this._hasFocus)
             {
                 this._keyboardEvents[code] = true;
             }
@@ -45,6 +81,14 @@ export class Input
         }
 
         var focusChanged = (input) => {
+            if (document.hasFocus())
+            {
+                this._hasFocus = true;
+            }
+            else
+            {
+                this._hasFocus = false;
+            }
             for (let i in input._keyboardEvents)
             {
                 input._keyboardEvents[i] = false;
@@ -57,20 +101,23 @@ export class Input
     }
 
     public enablePointerLock = () => {
+
+        // see https://threejs.org/examples/?q=pointer#misc_controls_pointerlock
+
         var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
         if ( havePointerLock ) {
             var element = document.body;
-            var pointerlockchange = function ( event ) {
+            var pointerlockchange = (e) => {
                 if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element ) {
-                    // Enable pointerLock
+                    this._hasFocus = true;
                 } else {
-                    // disable PointerLock
+                    this._hasFocus = false;
                 }
             };
-            var pointerlockerror = function ( event ) {
+            var pointerlockerror = (e) => {
                 // Error display
             };
-            // Hook pointer lock state change events
+            // Hook pointer lock state change es
             document.addEventListener( 'pointerlockchange', pointerlockchange, false );
             document.addEventListener( 'mozpointerlockchange', pointerlockchange, false );
             document.addEventListener( 'webkitpointerlockchange', pointerlockchange, false );
@@ -78,7 +125,7 @@ export class Input
             document.addEventListener( 'mozpointerlockerror', pointerlockerror, false );
             document.addEventListener( 'webkitpointerlockerror', pointerlockerror, false );
 
-            document.addEventListener( 'click', function (event) {
+            document.addEventListener( 'click', function (e) {
                 // Ask the browser to lock the pointer
                 element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
                 element.requestPointerLock();
@@ -111,6 +158,10 @@ export class Input
         return this._keyMap;
     }
 
+    public mouseMotion = () => {
+        return this._mouse;
+    }
+
     public checkInput = (control: string):boolean =>
     {
         var pressed:boolean = false;
@@ -124,5 +175,10 @@ export class Input
         }
 
         return pressed;
+    }
+
+    public hasFocus = ():boolean =>
+    {
+        return this._hasFocus;
     }
 }
