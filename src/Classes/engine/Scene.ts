@@ -1,6 +1,7 @@
 /// <reference path="../../typings/index.d.ts" />
 
 import { Camera } from './Camera';
+import { rndOpt } from './types';
 
 /**
  * Handles a scene to render and an animation function
@@ -12,6 +13,7 @@ export abstract class Scene {
     protected _camera: Camera;
     protected _mesh: { [index: string]: THREE.Mesh } = {};
     protected _scene: THREE.Scene;
+    protected _prevTime: number;
 
     constructor(blockId: string, rendererOptions: rndOpt, camera: Camera) {
         this._renderer = new THREE.WebGLRenderer(rendererOptions.options);
@@ -21,18 +23,21 @@ export abstract class Scene {
     }
 
     /**
+     * Init a scene
+     * @protected
+     * @memberof Scene
+     */
+    protected load = () => {
+        document.getElementById('cube').appendChild(this._renderer.domElement);
+        this._scene = new THREE.Scene();
+    }
+
+    /**
      * Collect all meshes and render
      * @returns { Void }
      * @memberof Scene
      */
     protected render = () => {
-        document.getElementById('cube').appendChild(this._renderer.domElement);
-        this._scene = new THREE.Scene();
-        for (let element in this._mesh)
-        {
-            this._scene.add(this._mesh[element]);
-        }
-
         this._renderer.render(this._scene, this._camera.getCamera());
     }
 
@@ -46,7 +51,21 @@ export abstract class Scene {
         for (let element in mesh)
         {
             this._mesh[element] = mesh[element];
+            this._scene.add(this._mesh[element]);
         }  
+    }
+
+    public removeMesh = (meshName: string) =>
+    {
+        this._scene.remove(this._mesh[meshName]);
+        delete this._mesh[meshName];
+    }
+
+    public pushMeshes = () => {
+        for (let element in this._mesh)
+        {
+            this._scene.add(this._mesh[element]);
+        }
     }
 
     /**  */
@@ -70,13 +89,5 @@ export abstract class Scene {
     {
         return this._mesh[meshName];
     }
-}
-
-/**
- * Interface for renderer options constructor.
- */
-export interface rndOpt {
-    options: {[key:string]:any};
-    width, height: number;
 }
 
