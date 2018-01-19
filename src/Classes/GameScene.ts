@@ -1,9 +1,11 @@
 /// <reference path="../typings/index.d.ts" />
 
-import { Scene, rndOpt } from './engine/Scene';
+import { Scene } from './engine/Scene';
 import { Camera } from './engine/Camera';
 import { Player } from './engine/Player';
 import { Input } from './engine/Input';
+import { rndOpt } from './engine/types';
+import { FramedBox } from './engine/FramedBox';
 
 export class GameScene extends Scene
 {
@@ -24,38 +26,26 @@ export class GameScene extends Scene
     }
 
     public init = () => {
-        // Création d'une géométrie wireframe pour le cube
-        var geometry = new THREE.BoxBufferGeometry(200,200,200);
-        var lineGeometry = new THREE.EdgesGeometry(geometry, 1);
-
-        var geometry2 = new THREE.BoxBufferGeometry(200,200,200);
-        var lineGeometry2 = new THREE.EdgesGeometry(geometry2, 1);
-
-        // matériau uni noir pour le cube
-        var material = new THREE.MeshBasicMaterial({
-            color: 0x000000
-        });
-
-        var meshCube = new THREE.Mesh(geometry, material);
-        var meshCube2 = new THREE.Mesh(geometry2, material);
-
-        meshCube2.position.set(500, 0, 200);
-
-        var line = new THREE.LineSegments(lineGeometry, new THREE.LineBasicMaterial({color: 0x777777}));
-        var line2 = new THREE.LineSegments(lineGeometry2, new THREE.LineBasicMaterial({color: 0x777777}));
-
-        this.addMesh({ "mainCube": meshCube, "secondaryCube": meshCube2});
-
-        meshCube.add(line);
-        meshCube2.add(line2);
         
+        this.load();
+        
+        var box1 = new FramedBox("box1", {x: 200, y: 200, z: 200});
+        var floor = new FramedBox("floor", { x: 5000, y: 0, z: 5000}, { x: 0, y: -101, z: 0 });
+
+        this._mesh[floor.name()] = floor.mesh();
+        this.pushMeshes();
+
+        //this._camera.getCamera().add(floor.mesh());
+
+        this._prevTime = performance.now();
         this.render();
 
         this._input.assignKeys({ 
             'up': [ 90, 87 ], // z, w
             'down': [ 83 ], // s
             'left': [ 81, 65 ], // q, a
-            'right': [ 68 ] // d
+            'right': [ 68 ], // d
+            'translate': [ 82 ] // r
         });
         this._input.run();        
     }
@@ -65,57 +55,74 @@ export class GameScene extends Scene
 
         if (this._input.hasFocus())
         {
-            this.mesh("mainCube").rotation.y += 0.003;
+            var time = performance.now();
+            var delta = (time - this._prevTime);
 
-            this.mesh("secondaryCube").rotation.y -= 0.003;
+            this.mesh("box1").rotation.y += 0.0003 * delta;
 
-            this.motion();
+            this.motion(delta);
 
             this.render();
+
+            this._prevTime = performance.now();
         }
     }
 
-    public motion = () =>
+    public motion = (delta: number) =>
     {
         var direction = this._camera.getDirection().normalize();
-        var speed = 10;
+        var speed = 0.5;
+
+        if(this._input.checkInput('translate'))
+        {
+            this._mesh.box1.translateZ(10);
+        }
         
         if (this._input.checkInput('up'))
         {
             this._camera.move.all({
-                x: direction.x * speed,
+                x: direction.x * speed * delta,
                 y: 0,
-                z: direction.z * speed
+                z: direction.z * speed * delta
             });
+            this._mesh.floor.position.x += direction.x * speed * delta;
+            this._mesh.floor.position.z += direction.z * speed * delta;
         }
         if (this._input.checkInput('down'))
         {
             this._camera.move.all({
-                x: - direction.x * speed,
+                x: - direction.x * speed * delta,
                 y: 0,
-                z: - direction.z * speed
+                z: - direction.z * speed * delta
             });
+            this._mesh.floor.position.x += - direction.x * speed * delta;
+            this._mesh.floor.position.z += - direction.z * speed * delta;
         }
         if (this._input.checkInput('left'))
         {
             this._camera.move.all({
-                x: direction.z * speed,
+                x: direction.z * speed * delta,
                 y: 0,
-                z: - direction.x * speed
+                z: - direction.x * speed * delta
             });
+            this._mesh.floor.position.x += direction.z * speed * delta;
+            this._mesh.floor.position.z += - direction.x * speed * delta;
         }
         if (this._input.checkInput('right'))
         {
             this._camera.move.all({
-                x: - direction.z * speed,
+                x: - direction.z * speed * delta,
                 y: 0,
-                z: direction.x * speed
+                z: direction.x * speed * delta
             });
+            this._mesh.floor.position.x += - direction.z * speed * delta;
+            this._mesh.floor.position.z += direction.x * speed * delta;
         }
 
         if (this._input.mouseMotion().rx != 0)
         {
-            this._camera.rotate.y(- this._input.mouseMotion().rx * 0.01);
+            this._camera.rotate.y(- this._input.mouseMotion().rx * 0.0005 * delta);
+            this._mesh.floor.rotation.y += - this._input.mouseMotion().rx * 0.0005 * delta;
         }
     }
 }
