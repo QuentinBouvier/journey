@@ -1,6 +1,7 @@
 /// <reference path="../../typings/index.d.ts" />
 
-import { coord } from "./types"
+import { coord } from "./types";
+import * as Utils from "./Utils";
 
 export class FramedBox
 {
@@ -9,6 +10,8 @@ export class FramedBox
     protected _line: THREE.LineSegments;
     protected _mesh: THREE.Mesh;
     protected _name: string;
+    protected _rotationSpeed: number;
+    protected _rotationDir: number;
     
     constructor(name: string, size: coord, position: coord = {x:0, y:0, z:0})
     {
@@ -27,14 +30,41 @@ export class FramedBox
         this._line = new THREE.LineSegments(lineGeometry, new THREE.LineBasicMaterial({color: 0x777777}));
 
         this._mesh.add(this._line);
+
+        if (Math.random() >= 0.5)
+        {
+            this._rotationDir = 1;
+        }
+        else
+        {
+            this._rotationDir = -1;
+        }
+
+        this._rotationSpeed = Utils.random(5, 8) / 10000;
+        console.log(this._rotationSpeed);
     }
 
-    public mesh = () =>
+    public mesh = ():THREE.Mesh =>
     {
         return this._mesh;
     }
 
-    public name = () => {
+    public name = ():string => {
         return this._name;
+    }
+
+    public getPosition = ():THREE.Vector3 =>
+    {
+        return this._mesh.position;
+    }
+
+    public rSpeed = () => 
+    {
+        return this._rotationSpeed;
+    }
+
+    public rDir = () => 
+    {
+        return this._rotationDir;
     }
 }

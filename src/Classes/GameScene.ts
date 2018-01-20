@@ -6,17 +6,22 @@ import { Player } from './engine/Player';
 import { Input } from './engine/Input';
 import { rndOpt } from './engine/types';
 import { FramedBox } from './engine/FramedBox';
+import * as Utils from './engine/utils';
 
 export class GameScene extends Scene
 {
     protected _camera: Player;
     protected _input: Input;
+    private _nOfBoxes: number;
+    private _boxes: FramedBox[];
 
     constructor(blockId: string, rendererOptions: rndOpt, camera: Player) {
 
         super(blockId, rendererOptions, camera);
 
         this._input = new Input();
+        this._boxes = [];
+        this._nOfBoxes = 30;
     }
 
     public launch = () =>
@@ -28,24 +33,25 @@ export class GameScene extends Scene
     public init = () => {
         
         this.load();
-        
-        var box1 = new FramedBox("box1", {x: 200, y: 200, z: 200});
-        var floor = new FramedBox("floor", { x: 5000, y: 0, z: 5000}, { x: 0, y: -101, z: 0 });
+    
+        var floor = new FramedBox("floor", { x: 18000, y: 0, z: 18000}, { x: 0, y: -101, z: 0 });
 
         this._mesh[floor.name()] = floor.mesh();
-        this.pushMeshes();
 
-        //this._camera.getCamera().add(floor.mesh());
+        this._generateBoxes();
+        this._boxes.forEach(element => {
+            this._mesh[element.name()] = element.mesh();
+        });
+        this.pushMeshes();
 
         this._prevTime = performance.now();
         this.render();
 
-        this._input.assignKeys({ 
+        this._input.assignKeys({
             'up': [ 90, 87 ], // z, w
             'down': [ 83 ], // s
             'left': [ 81, 65 ], // q, a
-            'right': [ 68 ], // d
-            'translate': [ 82 ] // r
+            'right': [ 68 ] // d
         });
         this._input.run();        
     }
@@ -58,7 +64,9 @@ export class GameScene extends Scene
             var time = performance.now();
             var delta = (time - this._prevTime);
 
-            this.mesh("box1").rotation.y += 0.0003 * delta;
+            this._boxes.forEach(element => {
+                element.mesh().rotation.y += element.rDir() * element.rSpeed() * delta;
+            });
 
             this.motion(delta);
 
@@ -68,15 +76,24 @@ export class GameScene extends Scene
         }
     }
 
+    private _generateBoxes = () => 
+    {
+        for (let i = 0; i < this._nOfBoxes; i++)
+        {
+            this._boxes[i] = new FramedBox("box" + i, 
+            {x: 200, y: 200, z: 200}, 
+            {
+                x: Utils.random(0, 9000),
+                y: 0,
+                z: Utils.random(0, 9000)
+            });
+        }
+    }
+
     public motion = (delta: number) =>
     {
         var direction = this._camera.getDirection().normalize();
         var speed = 0.5;
-
-        if(this._input.checkInput('translate'))
-        {
-            this._mesh.box1.translateZ(10);
-        }
         
         if (this._input.checkInput('up'))
         {
