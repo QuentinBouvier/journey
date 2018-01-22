@@ -14,12 +14,16 @@ export abstract class Scene {
     protected _mesh: { [index: string]: THREE.Mesh } = {};
     protected _scene: THREE.Scene;
     protected _prevTime: number;
+    protected _frameCount: number;
+    protected _elapsed: number;
 
     constructor(blockId: string, rendererOptions: rndOpt, camera: Camera) {
         this._renderer = new THREE.WebGLRenderer(rendererOptions.options);
         this._renderer.setSize(rendererOptions.width, rendererOptions.height);
 
         this._camera = camera;
+        this._frameCount = 0;
+        this._elapsed = 0;
     }
 
     /**
@@ -55,12 +59,21 @@ export abstract class Scene {
         }  
     }
 
+    /**
+     * Remove a mesh from renderer with its name
+     * @param { String } meshName
+     * @memberof Scene
+     */
     public removeMesh = (meshName: string) =>
     {
         this._scene.remove(this._mesh[meshName]);
         delete this._mesh[meshName];
     }
 
+    /**
+     * Add all meshes of the scene to the renderer
+     * @memberof Scene
+     */
     public pushMeshes = () => {
         for (let element in this._mesh)
         {

@@ -41,7 +41,6 @@ export class FramedBox
         }
 
         this._rotationSpeed = Utils.random(5, 8) / 10000;
-        console.log(this._rotationSpeed);
     }
 
     public mesh = ():THREE.Mesh =>

@@ -4,24 +4,27 @@ import { Scene } from './engine/Scene';
 import { Camera } from './engine/Camera';
 import { Player } from './engine/Player';
 import { Input } from './engine/Input';
-import { rndOpt } from './engine/types';
 import { FramedBox } from './engine/FramedBox';
+import { BoxGenerator } from './BoxGenerator';
+import { rndOpt } from './engine/types';
 import * as Utils from './engine/utils';
+import { BoxGeometry } from 'three';
 
 export class GameScene extends Scene
 {
     protected _camera: Player;
     protected _input: Input;
-    private _nOfBoxes: number;
     private _boxes: FramedBox[];
+    private _generator: BoxGenerator;
 
     constructor(blockId: string, rendererOptions: rndOpt, camera: Player) {
 
         super(blockId, rendererOptions, camera);
 
         this._input = new Input();
+        // range of the generator defines the scene size.
+        this._generator = new BoxGenerator(100, -9000, 9000);
         this._boxes = [];
-        this._nOfBoxes = 30;
     }
 
     public launch = () =>
@@ -30,15 +33,17 @@ export class GameScene extends Scene
         this.animate();
     }
 
-    public init = () => {
+    public init = () => 
+    {
         
         this.load();
     
-        var floor = new FramedBox("floor", { x: 18000, y: 0, z: 18000}, { x: 0, y: -101, z: 0 });
+        // using the generator range to define the floor size
+        var floor = new FramedBox("floor", { x: this._generator.range().max * 2, y: 0, z: this._generator.range().max * 2}, { x: 0, y: -101, z: 0 });
 
         this._mesh[floor.name()] = floor.mesh();
 
-        this._generateBoxes();
+        this._boxes = this._generator.generateBoxes();
         this._boxes.forEach(element => {
             this._mesh[element.name()] = element.mesh();
         });
@@ -51,42 +56,40 @@ export class GameScene extends Scene
             'up': [ 90, 87 ], // z, w
             'down': [ 83 ], // s
             'left': [ 81, 65 ], // q, a
-            'right': [ 68 ] // d
+            'right': [ 68 ], // d
+            'pos': [ 80 ]
         });
-        this._input.run();        
+        this._input.run();
     }
 
-    public animate = () => {
+    public animate = () => 
+    {
         requestAnimationFrame(() => this.animate());
+        this._frameCount++;
 
         if (this._input.hasFocus())
         {
             var time = performance.now();
             var delta = (time - this._prevTime);
 
+            // get rotation speed from FramedBox directly
             this._boxes.forEach(element => {
                 element.mesh().rotation.y += element.rDir() * element.rSpeed() * delta;
             });
 
+            // invoke input motion with time diference between two frames
             this.motion(delta);
+
+            if (this._frameCount % 10 == 0)
+            {
+                //moves farest boxes in generator range every 10 frames
+                this._generator.updateBoxes(this._camera.getCamera(), this._boxes);
+            }
 
             this.render();
 
             this._prevTime = performance.now();
-        }
-    }
-
-    private _generateBoxes = () => 
-    {
-        for (let i = 0; i < this._nOfBoxes; i++)
-        {
-            this._boxes[i] = new FramedBox("box" + i, 
-            {x: 200, y: 200, z: 200}, 
-            {
-                x: Utils.random(0, 9000),
-                y: 0,
-                z: Utils.random(0, 9000)
-            });
+            this._elapsed += delta;
         }
     }
 
@@ -140,6 +143,11 @@ export class GameScene extends Scene
         {
             this._camera.rotate.y(- this._input.mouseMotion().rx * 0.0005 * delta);
             this._mesh.floor.rotation.y += - this._input.mouseMotion().rx * 0.0005 * delta;
+        }
+
+        if (this._input.checkInput('pos'))
+        {
+            console.log(this._camera.position());
         }
     }
 }
