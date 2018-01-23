@@ -15,5 +15,5 @@ A small group of class to easily handle Scenes, camera, First person player, inp
 
 + No bounds world
 + First person controls
++ Procedurally generated world
 + TODO: Light physics
-+ TODO: Procedurally generated world
