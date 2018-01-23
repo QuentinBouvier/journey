@@ -1,6 +1,6 @@
 /// <reference path="../typings/index.d.ts" />
 
-import { FramedBox } from './engine/FramedBox';
+import { FramedBox } from './FramedBox';
 import * as Utils from './engine/Utils';
 
 export class BoxGenerator
@@ -42,14 +42,13 @@ export class BoxGenerator
             boxCoord = boxes[i].mesh().position;
             distance = originCoords.distanceTo(boxCoord);
 
-            if (distance > this._range.max + this._range.max * 20/100)
+            if (distance > this._range.max + this._range.max * 20/100 || distance < 300)
             {
                 boxes[i].mesh().position.set(
                     Utils.randomInt(originCoords.x + this._range.min, originCoords.x + this._range.max * 2),
                     0,
                     Utils.randomInt(originCoords.z + this._range.min, originCoords.z + this._range.max * 2)
                 );
-                console.log('Moved box ' + i + ' to ' + boxes[i].mesh().position.x + ', ' + boxes[i].mesh().position.z + ', ');
             }
         }
     }

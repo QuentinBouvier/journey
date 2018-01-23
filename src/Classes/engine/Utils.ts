@@ -14,7 +14,7 @@ export function randomInt(min: number, max: number): number
 
     if (min < 0 && max >= 0)
     {
-        output = Math.floor(rand * (max + absMin) - absMin + 1);
+        output = Math.floor(rand * (max + absMin) - absMin);
     }
     else if (min < 0 && max < 0)
     {

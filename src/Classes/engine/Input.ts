@@ -26,6 +26,40 @@ export class Input
         this.keyboard();        
     }
 
+    public disable = () =>
+    {
+        window.removeEventListener('mousemove', this._onMouseMove);
+
+        window.removeEventListener('keydown', this._onKeyDown);
+        window.removeEventListener('keyup', this._onKeyUp);
+
+        document.removeEventListener( 'click', this._requestPointerLock, false);
+
+        document.removeEventListener( 'pointerlockchange', this._pointerlockchange, false );
+        document.removeEventListener( 'mozpointerlockchange', this._pointerlockchange, false );
+        document.removeEventListener( 'webkitpointerlockchange', this._pointerlockchange, false );
+    }
+
+    
+    private _onMouseMove = (e) =>
+    {
+        var movementX = e.movementX || e.mozMovementX || e.webkitMovementX || 0;
+        var movementY = e.movementY || e.mozMovementY || e.webkitMovementY || 0;
+        
+        this._mouse = {
+            rx: movementX,
+            ry: movementY
+        }
+    }
+    
+    public resetMouseMotion = () =>
+    {
+        this._mouse = {
+            rx: 0,
+            ry: 0
+        }
+    }
+
     /**
      * Set listener for mouse movements.
      * Update this._mouse with mousemove offsets
@@ -33,31 +67,23 @@ export class Input
      * @memberof Input
      */
     public mouse = () => {
+        window.addEventListener('mousemove', this._onMouseMove);
+    }
 
-        var motionStop = () => {
-            this._mouse = {
-                rx: 0,
-                ry: 0
+    private _onKeyDown = (e) =>
+        {
+            var code: number = e.keyCode;
+
+            if (this._keyboardEvents[code] != true && this._hasFocus)
+            {
+                this._keyboardEvents[code] = true;
             }
         }
-
-        window.addEventListener('mousemove', (e) => {
-
-            if (timer) {
-                window.clearTimeout(timer);
-            }
-
-            var movementX = e.movementX || e.mozMovementX || e.webkitMovementX || 0;
-            var movementY = e.movementY || e.mozMovementY || e.webkitMovementY || 0;
-
-            this._mouse = {
-                rx: movementX,
-                ry: movementY
-            }
-
-            var timer = window.setTimeout(() => { motionStop() }, 15);
-        });
-    }
+    private _onKeyUp = (e) =>
+        {
+            var code:number = e.keyCode;
+            this._keyboardEvents[code] = false;
+        }
 
     /**
      * Set listeners on keyup and keydown.
@@ -66,19 +92,8 @@ export class Input
      * @memberof Input
      */
     public keyboard = () => {
-        window.addEventListener('keydown', (e) => {
-            var code: number = e.keyCode;
-
-            if (this._keyboardEvents[code] != true && this._hasFocus)
-            {
-                this._keyboardEvents[code] = true;
-            }
-        });
-
-        window.addEventListener('keyup', (e) => {
-            var code:number = e.keyCode;
-            this._keyboardEvents[code] = false;
-        });
+        window.addEventListener('keydown', this._onKeyDown);
+        window.addEventListener('keyup', this._onKeyUp);
     }
 
     /**
@@ -122,6 +137,23 @@ export class Input
         window.addEventListener("blur", () => focusChanged(this));
     }
 
+    private _pointerlockchange = (e) => {
+        var element = document.body;
+        if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element ) {
+            this._hasFocus = true;
+        } else {
+            this._hasFocus = false;
+        }
+    };
+
+    private _requestPointerLock = () =>
+    {
+        var element = document.body;
+        // Ask the browser to lock the pointer
+        element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
+        element.requestPointerLock();
+    }
+
     /**
      * Set pointerlock on the window when the game is clicked
      * Update this._hasFocus when pointer lock is caught or lost.
@@ -135,29 +167,18 @@ export class Input
         var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
         if ( havePointerLock ) {
             var element = document.body;
-            var pointerlockchange = (e) => {
-                if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element ) {
-                    this._hasFocus = true;
-                } else {
-                    this._hasFocus = false;
-                }
-            };
             var pointerlockerror = (e) => {
                 // Error display
             };
             // Hook pointer lock state change es
-            document.addEventListener( 'pointerlockchange', pointerlockchange, false );
-            document.addEventListener( 'mozpointerlockchange', pointerlockchange, false );
-            document.addEventListener( 'webkitpointerlockchange', pointerlockchange, false );
+            document.addEventListener( 'pointerlockchange', this._pointerlockchange, false );
+            document.addEventListener( 'mozpointerlockchange', this._pointerlockchange, false );
+            document.addEventListener( 'webkitpointerlockchange', this._pointerlockchange, false );
             document.addEventListener( 'pointerlockerror', pointerlockerror, false );
             document.addEventListener( 'mozpointerlockerror', pointerlockerror, false );
             document.addEventListener( 'webkitpointerlockerror', pointerlockerror, false );
 
-            document.addEventListener( 'click', function (e) {
-                // Ask the browser to lock the pointer
-                element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
-                element.requestPointerLock();
-            }, false);
+            document.addEventListener( 'click', this._requestPointerLock, false);
         } else {
             alert('Your browser doesn\'t seem to support Pointer Lock API');
         }
