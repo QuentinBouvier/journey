@@ -4,11 +4,12 @@ import { Scene } from './engine/Scene';
 import { Camera } from './engine/Camera';
 import { Player } from './engine/Player';
 import { Input } from './engine/Input';
-import { FramedBox } from './engine/FramedBox';
+import { FramedBox } from './FramedBox';
 import { BoxGenerator } from './BoxGenerator';
 import { rndOpt } from './engine/types';
 import * as Utils from './engine/utils';
 import { BoxGeometry } from 'three';
+import { FloatingText } from './FloatingText';
 
 export class GameScene extends Scene
 {
@@ -41,12 +42,24 @@ export class GameScene extends Scene
         // using the generator range to define the floor size
         var floor = new FramedBox("floor", { x: this._generator.range().max * 2, y: 0, z: this._generator.range().max * 2}, { x: 0, y: -101, z: 0 });
 
+        var title1 = new FloatingText("title1", "QUENTIN B.", new THREE.Vector3(118,10,-30));
+        var title2 = new FloatingText("title2", "WEBDEV", new THREE.Vector3(174,-100,-30));
+
+        document.addEventListener('fontloaded', (e) => 
+        {
+            this._mesh[e.detail.name()] = e.detail.mesh();
+            this.pushMeshes();
+        });
+
+        console.log(title1.position().distanceTo(this._camera.getCamera().position));
+
         this._mesh[floor.name()] = floor.mesh();
 
         this._boxes = this._generator.generateBoxes();
         this._boxes.forEach(element => {
             this._mesh[element.name()] = element.mesh();
         });
+
         this.pushMeshes();
 
         this._prevTime = performance.now();
@@ -57,7 +70,6 @@ export class GameScene extends Scene
             'down': [ 83 ], // s
             'left': [ 81, 65 ], // q, a
             'right': [ 68 ], // d
-            'pos': [ 80 ]
         });
         this._input.run();
     }
@@ -145,9 +157,6 @@ export class GameScene extends Scene
             this._mesh.floor.rotation.y += - this._input.mouseMotion().rx * 0.0005 * delta;
         }
 
-        if (this._input.checkInput('pos'))
-        {
-            console.log(this._camera.position());
-        }
+        this._input.resetMouseMotion();
     }
 }

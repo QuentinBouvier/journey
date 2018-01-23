@@ -15,7 +15,7 @@ var cameraOptions = {
     aspect: rendererOptions.width / rendererOptions.height,
     near: 1,
     far: 10000,
-    x: 200,
+    x: 375,
     y: -50,
     z: 800
 };
